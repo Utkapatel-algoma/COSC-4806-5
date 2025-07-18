@@ -72,7 +72,7 @@ class Reminders extends Controller {
     public function delete($id = '') {
         $reminder = $this->model('Reminder');
         $reminder->delete_reminder($id);
-        header('Location: /reminders'); // Redirect back to the list
+        header('Location: /reminders'); // Redirect back to list
         exit();
     }
 }
