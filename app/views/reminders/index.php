@@ -1,16 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Your Reminders</title>
-    </head>
-<body>
+<?php require_once VIEWS . DS . 'templates/header_private.php'; ?>
+
     <h1>Your Reminders</h1>
     <a href="/reminders/create">Add New Reminder</a>
 
     <?php if (!empty($reminders)): ?>
-        <table border="1" style="width:100%; border-collapse: collapse;">
+        <table border="1">
             <thead>
                 <tr>
                     <th>ID</th>
@@ -38,6 +32,4 @@
         <p>No reminders found. Add your first reminder!</p>
     <?php endif; ?>
 
-    <p><a href="/home">Back to Home</a></p>
-</body>
-</html>
+<?php require_once VIEWS . DS . 'templates/footer.php'; ?>

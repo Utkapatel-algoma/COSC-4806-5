@@ -1,12 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
-</head>
-<body>
-    <h1>Login Page</h1>
+<?php require_once VIEWS . DS . 'templates/header_public.php'; ?>
+
+    <h2>Login Page</h2>
     <?php if (isset($_SESSION['error'])): ?>
         <p style="color: red;"><?= htmlspecialchars($_SESSION['error']); unset($_SESSION['error']); ?></p>
     <?php endif; ?>
@@ -20,6 +14,6 @@
         <input type="password" id="password" name="password" required><br><br>
         <input type="submit" value="Login">
     </form>
-    <p><a href="/create">Create a new account</a></p>
-</body>
-</html>
+    <p>Don't have an account? <a href="/create">Create a new account</a></p>
+
+<?php require_once VIEWS . DS . 'templates/footer.php'; ?>

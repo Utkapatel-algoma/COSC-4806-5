@@ -1,12 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Account</title>
-</head>
-<body>
-    <h1>Create New Account</h1>
+<?php require_once VIEWS . DS . 'templates/header_public.php'; ?>
+
+    <h2>Create New Account</h2>
     <?php if (isset($_SESSION['error'])): ?>
         <p style="color: red;"><?= htmlspecialchars($_SESSION['error']); unset($_SESSION['error']); ?></p>
     <?php endif; ?>
@@ -18,5 +12,5 @@
         <input type="submit" value="Register">
     </form>
     <p>Already have an account? <a href="/login">Login here</a></p>
-</body>
-</html>
+
+<?php require_once VIEWS . DS . 'templates/footer.php'; ?>

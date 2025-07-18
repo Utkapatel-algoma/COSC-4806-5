@@ -1,11 +1,5 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Update Reminder</title>
-</head>
-<body>
+<?php require_once VIEWS . DS . 'templates/header_private.php'; ?>
+
     <h1>Update Reminder</h1>
     <?php if (isset($reminder) && $reminder): ?>
         <form action="/reminders/saveUpdate" method="post">
@@ -18,5 +12,5 @@
     <?php else: ?>
         <p>Reminder not found for update.</p>
     <?php endif; ?>
-</body>
-</html>
+
+<?php require_once VIEWS . DS . 'templates/footer.php'; ?>
