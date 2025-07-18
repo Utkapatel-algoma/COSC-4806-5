@@ -17,17 +17,16 @@ class Login extends Controller {
                 // Authentication successful
                 $_SESSION['auth'] = 1;
                 $_SESSION['username'] = $username;
-                $_SESSION['message'] = 'Login successful!';
-                header('Location: /home'); // Still redirect to home on success
+                $_SESSION['toast_message'] = 'Login successful!'; // Set toast message
+                $_SESSION['toast_type'] = 'success'; // Set toast type
+                header('Location: /home'); // Redirect to home page
                 exit();
             } else {
                 // Authentication failed
-                $_SESSION['error'] = 'Invalid username or password.'; // Set the error message
-
-                // Instead of redirecting, directly call the index method to display the view
-                // This keeps the error message in the current session context
-                $this->index(); // Calls the index method to render the login page with the error
-                exit(); // Ensure script stops after rendering
+                $_SESSION['toast_message'] = 'Invalid username or password.'; // Set toast message for error
+                $_SESSION['toast_type'] = 'danger'; // Set toast type for error
+                header('Location: /login'); // Redirect back to the login page (still needed for session to persist toast)
+                exit();
             }
         } else {
             // Not a POST request, redirect to login page
@@ -38,6 +37,8 @@ class Login extends Controller {
 
     public function logout() {
         session_destroy();
+        $_SESSION['toast_message'] = 'You have been logged out.';
+        $_SESSION['toast_type'] = 'info';
         header('Location: /login');
         exit();
     }

@@ -1,28 +1,6 @@
 <?php require_once VIEWS . DS . 'templates/header_public.php'; ?>
 
     <h2 class="mb-4">Login Page</h2>
-    <?php if (isset($_SESSION['error'])): ?>
-        <div class="alert alert-danger d-flex align-items-center" role="alert">
-            <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Danger:">
-                <use xlink:href="#exclamation-triangle-fill"/>
-            </svg>
-            <div>
-                <?= htmlspecialchars($_SESSION['error']); ?>
-            </div>
-        </div>
-        <?php unset($_SESSION['error']); ?>
-    <?php endif; ?>
-    <?php if (isset($_SESSION['message'])): ?>
-        <div class="alert alert-success d-flex align-items-center" role="alert">
-            <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Success:">
-                <use xlink:href="#check-circle-fill"/>
-            </svg>
-            <div>
-                <?= htmlspecialchars($_SESSION['message']); ?>
-            </div>
-        </div>
-        <?php unset($_SESSION['message']); ?>
-    <?php endif; ?>
     <form action="/login/verify" method="post">
         <div class="mb-3">
             <label for="username" class="form-label">Username:</label>
