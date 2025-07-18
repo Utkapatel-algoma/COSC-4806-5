@@ -1,19 +1,39 @@
 <?php require_once VIEWS . DS . 'templates/header_public.php'; ?>
 
-    <h2>Login Page</h2>
+    <h2 class="mb-4">Login Page</h2>
     <?php if (isset($_SESSION['error'])): ?>
-        <p style="color: red;"><?= htmlspecialchars($_SESSION['error']); unset($_SESSION['error']); ?></p>
+        <div class="alert alert-danger d-flex align-items-center" role="alert">
+            <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Danger:">
+                <use xlink:href="#exclamation-triangle-fill"/>
+            </svg>
+            <div>
+                <?= htmlspecialchars($_SESSION['error']); ?>
+            </div>
+        </div>
+        <?php unset($_SESSION['error']); ?>
     <?php endif; ?>
     <?php if (isset($_SESSION['message'])): ?>
-        <p style="color: green;"><?= htmlspecialchars($_SESSION['message']); unset($_SESSION['message']); ?></p>
+        <div class="alert alert-success d-flex align-items-center" role="alert">
+            <svg class="bi flex-shrink-0 me-2" width="24" height="24" role="img" aria-label="Success:">
+                <use xlink:href="#check-circle-fill"/>
+            </svg>
+            <div>
+                <?= htmlspecialchars($_SESSION['message']); ?>
+            </div>
+        </div>
+        <?php unset($_SESSION['message']); ?>
     <?php endif; ?>
     <form action="/login/verify" method="post">
-        <label for="username">Username:</label><br>
-        <input type="text" id="username" name="username" required><br>
-        <label for="password">Password:</label><br>
-        <input type="password" id="password" name="password" required><br><br>
-        <input type="submit" value="Login">
+        <div class="mb-3">
+            <label for="username" class="form-label">Username:</label>
+            <input type="text" class="form-control" id="username" name="username" required>
+        </div>
+        <div class="mb-3">
+            <label for="password" class="form-label">Password:</label>
+            <input type="password" class="form-control" id="password" name="password" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Login</button>
     </form>
-    <p>Don't have an account? <a href="/create">Create a new account</a></p>
+    <p class="mt-3">Don't have an account? <a href="/create">Create a new account</a></p>
 
 <?php require_once VIEWS . DS . 'templates/footer.php'; ?>
