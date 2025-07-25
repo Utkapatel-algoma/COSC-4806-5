@@ -1,18 +1,20 @@
 <?php
+// app/core/Controller.php
 
 class Controller {
-
-    public function model ($model) {
-        // Use the MODELS constant for absolute path
-        require_once MODELS . DS . $model . '.php';
+    protected function model($model) {
+        // Construct the path to the model file using DIRECTORY_SEPARATOR
+        require_once APPROOT . DIRECTORY_SEPARATOR . 'models' . DIRECTORY_SEPARATOR . $model . '.php';
         return new $model();
     }
 
-    public function view ($view, $data = []) {
-        // Extract the data to make it available in the view
-        extract($data);
-        // Use the VIEWS constant for absolute path
-        require_once VIEWS . DS . $view . '.php';
+    protected function view($view, $data = []) {
+        // Construct the path to the view file using DIRECTORY_SEPARATOR
+        if (file_exists(APPROOT . DIRECTORY_SEPARATOR . 'views' . DIRECTORY_SEPARATOR . $view . '.php')) {
+            require_once APPROOT . DIRECTORY_SEPARATOR . 'views' . DIRECTORY_SEPARATOR . $view . '.php';
+        } else {
+            // Error handling if view not found
+            die('View does not exist: ' . APPROOT . DIRECTORY_SEPARATOR . 'views' . DIRECTORY_SEPARATOR . $view . '.php');
+        }
     }
-
 }

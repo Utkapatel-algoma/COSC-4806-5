@@ -1,6 +1,13 @@
 <?php
 // index.php - Main Application Entry Point
 
+// Load the configuration file FIRST, as it defines crucial constants like DS, CORE, MODELS, etc.
+require_once 'app/config/config.php'; // <<< MOVED config.php inclusion here, to the very top
+
+// Ensure error reporting is set up early
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
 // IMPORTANT: All session-related ini_set and session_set_cookie_params MUST be set
 // BEFORE session_start() is called.
 ini_set('session.gc_maxlifetime', 28800);
@@ -17,16 +24,9 @@ if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
 
-// Ensure error reporting is set up early
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-
-
-// require_once 'app/init.php';
-// IMPORTANT: You MUST remove the session_start(), ini_set('session.gc_maxlifetime', ...),
-// ini_set('session.gc_probability', ...), ini_set('session.gc_divisor', ...),
-// and session_set_cookie_params(...) calls from your app/init.php file.
-// Only the require_once statements for core files should remain in init.php.
+// Now load the initialization file.
+// app/init.php should NOT contain session-related ini_set, session_set_cookie_params, or session_start().
+// It also should NOT require config.php.
 require_once 'app/init.php';
 
 // Instantiate your main application class

@@ -1,84 +1,79 @@
 <?php
+// app/core/App.php
 
 class App {
-
-    protected $controller = 'login';
-    protected $method = 'index';
-    protected $special_url = ['apply']; // Example of special URLs
-    protected $params = [];
+    protected $controller = 'home'; // Default controller
+    protected $method = 'index';    // Default method
+    protected $params = [];         // Default parameters
 
     public function __construct() {
-        // Start session if not already started
-        if (session_status() == PHP_SESSION_NONE) {
-            session_start();
-        }
-
         $url = $this->parseUrl();
 
-        // Determine the requested controller from the URL
-        $requested_controller = isset($url[1]) ? strtolower($url[1]) : $this->controller;
+        // Determine the base path for controllers
+        // __DIR__ gives the directory of the current file (app/core)
+        // dirname(__DIR__) goes up one level to 'app'
+        // dirname(dirname(__DIR__)) goes up another level to 'workspace' (project root)
+        // So, we need to go up two levels from app/core to get to the project root,
+        // then append app/controllers.
+        $controllerBasePath = dirname(__DIR__) . '/controllers/';
 
-        // Check if controller file exists. If not, fallback to default or handle error.
-        if (file_exists(CONTROLLERS . DS . $requested_controller . '.php')) {
-            $this->controller = $requested_controller;
+
+        // --- DEBUGGING START ---
+        error_log("Parsed URL: " . print_r($url, true));
+        $requestedControllerName = ucfirst($url[0] ?? $this->controller);
+        $controllerFilePath = $controllerBasePath . $requestedControllerName . '.php';
+        error_log("Attempting to load controller (Absolute Path): " . $controllerFilePath);
+        error_log("File exists check: " . (file_exists($controllerFilePath) ? 'TRUE' : 'FALSE'));
+        // --- DEBUGGING END ---
+
+        // Check if a controller exists in the 'controllers' directory
+        // Use the default controller if $url[0] is not set or empty
+        $requestedController = isset($url[0]) && !empty($url[0]) ? ucfirst($url[0]) : ucfirst($this->controller); // Ensure default is also capitalized
+
+        if (file_exists($controllerBasePath . $requestedController . '.php')) {
+            $this->controller = $requestedController; // Store the capitalized name
+            unset($url[0]);
         } else {
-            // If requested controller does not exist
-            if (isset($_SESSION['auth']) && $_SESSION['auth'] == 1) {
-                // If authenticated, redirect to home for invalid controller
-                $this->controller = 'home';
-                header('Location: /home');
-                exit;
-            } else {
-                // If not authenticated, default to login controller for invalid controller
-                $this->controller = 'login';
+            // If the requested controller doesn't exist, fall back to the default 'home' controller
+            // and log a warning if it's not the default that was requested
+            if (isset($url[0]) && !empty($url[0]) && $url[0] !== 'home') {
+                error_log("Controller '" . $url[0] . "' not found. Falling back to default 'home' controller.");
             }
+            // Ensure the default controller file exists using the absolute path
+            if (!file_exists($controllerBasePath . ucfirst($this->controller) . '.php')) {
+                die("Fatal Error: Default controller '" . ucfirst($this->controller) . ".php' not found at path: " . $controllerBasePath . ucfirst($this->controller) . ".php" . ". Please ensure it exists in app/controllers.");
+            }
+            // The default controller 'home' is already set, no need to change $this->controller
+            // However, we must ensure $this->controller is capitalized for the require_once below
+            $this->controller = ucfirst($this->controller);
         }
 
-        // --- Authentication and Access Control ---
-        // If user is NOT authenticated AND trying to access a restricted page (not login or create)
-        if (!isset($_SESSION['auth']) || $_SESSION['auth'] != 1) {
-            if ($this->controller !== 'login' && $this->controller !== 'create') {
-                // Set an error message if they try to access a private page directly
-                $_SESSION['toast_message'] = 'Please login to access this page.'; // Using toast for this
-                $_SESSION['toast_type'] = 'warning';
-                header('Location: /login'); // Redirect to login page
-                exit;
-            }
-        } else {
-            // If user IS authenticated and trying to access 'login' or 'create'
-            if ($this->controller === 'login' || $this->controller === 'create') {
-                header('Location: /home'); // Redirect to home page
-                exit;
-            }
-        }
-        // --- End Authentication and Access Control ---
 
-        $_SESSION['controller'] = $this->controller; // Store current controller in session
+        // Include the controller file using the absolute path
+        require_once $controllerBasePath . $this->controller . '.php'; // Use the potentially capitalized $this->controller
 
-        require_once CONTROLLERS . DS . $this->controller . '.php';
+        // Instantiate the controller
         $this->controller = new $this->controller;
 
-        // Determine the method
-        $this->method = 'index'; // Default method
-        if (isset($url[2]) && method_exists($this->controller, $url[2])) {
-            $this->method = $url[2];
+        // Check for method
+        if (isset($url[1])) {
+            if (method_exists($this->controller, $url[1])) {
+                $this->method = $url[1];
+                unset($url[1]);
+            }
         }
 
-        $_SESSION['method'] = $this->method; // Store current method in session
+        // Get parameters
+        $this->params = $url ? array_values($url) : [];
 
-        // Prepare parameters
-        $this->params = $url ? array_values(array_slice($url, 2)) : [];
+        // Call the controller method with parameters
         call_user_func_array([$this->controller, $this->method], $this->params);
     }
 
     public function parseUrl() {
-        $u = $_SERVER['REQUEST_URI'] ?? '';
-        $u = strtok($u, '?');
-        $u = strtok($u, '#');
-        $url = explode('/', filter_var(rtrim($u, '/'), FILTER_SANITIZE_URL));
-        if (empty($url[0])) {
-            unset($url[0]);
+        if (isset($_GET['url'])) {
+            return $url = explode('/', filter_var(rtrim($_GET['url'], '/'), FILTER_SANITIZE_URL));
         }
-        return $url;
+        return []; // Return an empty array if no URL is set
     }
 }
