@@ -2,7 +2,7 @@
 // app/core/App.php
 
 class App {
-    protected $controller = 'home'; // Default controller
+    protected $controller = 'Home'; // Default controller (capitalized)
     protected $method = 'index';    // Default method
     protected $params = [];         // Default parameters
 
@@ -10,47 +10,29 @@ class App {
         $url = $this->parseUrl();
 
         // Determine the base path for controllers
-        // __DIR__ gives the directory of the current file (app/core)
-        // dirname(__DIR__) goes up one level to 'app'
-        // dirname(dirname(__DIR__)) goes up another level to 'workspace' (project root)
-        // So, we need to go up two levels from app/core to get to the project root,
-        // then append app/controllers.
-        $controllerBasePath = dirname(__DIR__) . '/controllers/';
-
-
-        // --- DEBUGGING START ---
-        error_log("Parsed URL: " . print_r($url, true));
-        $requestedControllerName = ucfirst($url[0] ?? $this->controller);
-        $controllerFilePath = $controllerBasePath . $requestedControllerName . '.php';
-        error_log("Attempting to load controller (Absolute Path): " . $controllerFilePath);
-        error_log("File exists check: " . (file_exists($controllerFilePath) ? 'TRUE' : 'FALSE'));
-        // --- DEBUGGING END ---
+        $controllerBasePath = APPROOT . DIRECTORY_SEPARATOR . 'controllers' . DIRECTORY_SEPARATOR;
 
         // Check if a controller exists in the 'controllers' directory
         // Use the default controller if $url[0] is not set or empty
-        $requestedController = isset($url[0]) && !empty($url[0]) ? ucfirst($url[0]) : ucfirst($this->controller); // Ensure default is also capitalized
+        $requestedController = isset($url[0]) && !empty($url[0]) ? ucfirst($url[0]) : $this->controller;
 
-        if (file_exists($controllerBasePath . $requestedController . '.php')) {
-            $this->controller = $requestedController; // Store the capitalized name
+        $controllerFilePath = $controllerBasePath . $requestedController . '.php';
+
+        if (file_exists($controllerFilePath)) {
+            $this->controller = $requestedController;
             unset($url[0]);
         } else {
-            // If the requested controller doesn't exist, fall back to the default 'home' controller
-            // and log a warning if it's not the default that was requested
-            if (isset($url[0]) && !empty($url[0]) && $url[0] !== 'home') {
-                error_log("Controller '" . $url[0] . "' not found. Falling back to default 'home' controller.");
+            // If the requested controller doesn't exist, fall back to the default 'Home' controller
+            // Ensure the default controller file exists
+            $defaultControllerFilePath = $controllerBasePath . $this->controller . '.php';
+            if (!file_exists($defaultControllerFilePath)) {
+                die("Fatal Error: Default controller '" . $this->controller . ".php' not found at path: " . $defaultControllerFilePath . ". Please ensure it exists in app/controllers.");
             }
-            // Ensure the default controller file exists using the absolute path
-            if (!file_exists($controllerBasePath . ucfirst($this->controller) . '.php')) {
-                die("Fatal Error: Default controller '" . ucfirst($this->controller) . ".php' not found at path: " . $controllerBasePath . ucfirst($this->controller) . ".php" . ". Please ensure it exists in app/controllers.");
-            }
-            // The default controller 'home' is already set, no need to change $this->controller
-            // However, we must ensure $this->controller is capitalized for the require_once below
-            $this->controller = ucfirst($this->controller);
+            // No need to change $this->controller as it's already set to 'Home'
         }
 
-
-        // Include the controller file using the absolute path
-        require_once $controllerBasePath . $this->controller . '.php'; // Use the potentially capitalized $this->controller
+        // Include the controller file
+        require_once $controllerBasePath . $this->controller . '.php';
 
         // Instantiate the controller
         $this->controller = new $this->controller;

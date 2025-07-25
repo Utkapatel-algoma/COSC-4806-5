@@ -46,12 +46,70 @@ class Movie extends Controller {
         $movieModel = $this->model('Movie');
         $details = $movieModel->getMovieDetails($imdbId);
 
+        // Fetch user's existing rating and all other ratings for the movie
+        $userRating = null;
+        $allRatings = [];
+        if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
+            $ratingModel = $this->model('Rating');
+            $userRating = $ratingModel->getUserRating($_SESSION['user_id'], $imdbId);
+        }
+        $allRatings = $this->model('Rating')->getAllRatingsForMovie($imdbId);
+
+
         if ($details) {
-            $this->view('movie/details', ['details' => $details]);
+            $this->view('movie/details', [
+                'details' => $details,
+                'user_rating' => $userRating,
+                'all_ratings' => $allRatings
+            ]);
         } else {
             $_SESSION['toast_message'] = 'Could not retrieve details for the movie.';
             $_SESSION['toast_type'] = 'danger';
             header('Location: /movie'); // Redirect back to search
+            exit();
+        }
+    }
+
+    public function submitRating() {
+        // Ensure session is started for session variables if not already
+        if (session_status() == PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        // Only logged-in users can submit ratings
+        if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
+            $_SESSION['toast_message'] = 'You must be logged in to submit a rating.';
+            $_SESSION['toast_type'] = 'danger';
+            header('Location: /login');
+            exit();
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $imdbId = $_POST['imdb_id'] ?? '';
+            $rating = $_POST['rating'] ?? '';
+            $userId = $_SESSION['user_id'];
+
+            // Validate inputs
+            if (empty($imdbId) || !is_numeric($rating) || $rating < 1 || $rating > 5 || floor($rating) != $rating) {
+                $_SESSION['toast_message'] = 'Invalid rating submitted. Rating must be a whole number between 1 and 5.';
+                $_SESSION['toast_type'] = 'danger';
+                header('Location: /movie/details/' . urlencode($imdbId));
+                exit();
+            }
+
+            $ratingModel = $this->model('Rating');
+            if ($ratingModel->submitRating($userId, $imdbId, (int)$rating)) {
+                $_SESSION['toast_message'] = 'Your rating has been submitted successfully!';
+                $_SESSION['toast_type'] = 'success';
+            } else {
+                $_SESSION['toast_message'] = 'Failed to submit your rating. Please try again.';
+                $_SESSION['toast_type'] = 'danger';
+            }
+            header('Location: /movie/details/' . urlencode($imdbId));
+            exit();
+        } else {
+            // Not a POST request, redirect back to movie details
+            header('Location: /movie');
             exit();
         }
     }
