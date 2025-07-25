@@ -1,64 +1,171 @@
+<?php
+// templates/header_private.php
+
+// Ensure session is started if it's not already, though it should be by the controller
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>COSC 4806 Application</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <title>My App</title>
+    <!-- You might have your CSS links here -->
+    <link rel="stylesheet" href="/css/style.css">
+    <!-- Add Tailwind CSS if you are using it, otherwise remove this line -->
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Your existing custom styles can go here or in a separate CSS file */
-        body { font-family: Arial, sans-serif; } /* Basic font */
-        .navbar-brand { font-weight: bold; }
-        .main-content { padding-top: 20px; padding-bottom: 20px; }
-        footer { margin-top: 40px; padding-top: 10px; border-top: 1px solid #eee; text-align: center; }
-        /* Style adjustments for tables if needed */
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-        th { background-color: #f2f2f2; }
+        /* Custom styles for the header */
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            background-color: #f4f7f6;
+        }
+        .header-container {
+            background-color: #ffffff;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            border-bottom-left-radius: 8px;
+            border-bottom-right-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap; /* Allow wrapping on smaller screens */
+        }
+        .header-left a {
+            font-weight: bold;
+            font-size: 1.5rem;
+            color: #333;
+            text-decoration: none;
+            padding: 0.5rem 0;
+            display: block;
+        }
+        .header-nav ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap; /* Allow navigation items to wrap */
+            justify-content: center; /* Center items on wrap */
+        }
+        .header-nav ul li a {
+            color: #555;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 0;
+            transition: color 0.3s ease;
+        }
+        .header-nav ul li a:hover {
+            color: #007bff; /* Example hover color */
+        }
+        .header-right {
+            margin-left: auto; /* Push logout to the right */
+        }
+        .header-right a {
+            background-color: #dc3545; /* Red for logout */
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+        }
+        .header-right a:hover {
+            background-color: #c82333;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 1rem;
+            }
+            .header-nav ul {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+                width: 100%;
+                margin-top: 1rem;
+            }
+            .header-right {
+                margin-top: 1rem;
+                margin-left: 0;
+                width: 100%;
+                text-align: center;
+            }
+            .header-right a {
+                display: block;
+                width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
-    <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
-      <symbol id="check-circle-fill" fill="currentColor" viewBox="0 0 16 16">
-        <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
-      </symbol>
-      <symbol id="info-fill" fill="currentColor" viewBox="0 0 16 16">
-        <path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm.93-9.412-1 4.705c-.07.34.029.533.304.533.194 0 .487-.07.686-.246l-.088.416c-.287.346-.92.598-1.465.598-.703 0-1.002-.422-.808-1.319l.738-3.468c.064-.293.006-.399-.287-.47l-.451-.081.082-.381 2.29-.287zM8 5.5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z"/>
-      </symbol>
-      <symbol id="exclamation-triangle-fill" fill="currentColor" viewBox="0 0 16 16">
-        <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
-      </symbol>
-    </svg>
-
-    <div aria-live="polite" aria-atomic="true" class="position-relative">
-        <div class="toast-container position-absolute top-0 end-0 p-3">
-            </div>
+    <div class="header-container">
+        <div class="header-left">
+            <a href="/home">My App</a>
+        </div>
+        <nav class="header-nav">
+            <ul>
+                <li><a href="/home">Home</a></li>
+                <li><a href="/reminders">Reminders</a></li>
+                <li><a href="/about">About Us</a></li>
+                <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin'): ?>
+                    <li><a href="/reports">Admin Reports</a></li>
+                <?php endif; ?>
+            </ul>
+        </nav>
+        <div class="header-right">
+            <a href="/logout">Logout</a>
+        </div>
     </div>
 
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="/home">My App</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavPrivate" aria-controls="navbarNavPrivate" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNavPrivate">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item">
-                        <a class="nav-link" href="/home">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/reminders">Reminders</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/about">About Us</a>
-                    </li>
-                </ul>
-                <ul class="navbar-nav">
-                    <li class="nav-item">
-                        <a class="nav-link" href="/logout">Logout</a>
-                    </li>
-                </ul>
-            </div>
+    <!-- Toast Message Display -->
+    <?php if (isset($_SESSION['toast_message'])): ?>
+        <div id="toast-message" class="toast toast-<?php echo htmlspecialchars($_SESSION['toast_type']); ?>">
+            <?php echo htmlspecialchars($_SESSION['toast_message']); ?>
         </div>
-    </nav>
-    <main class="container main-content">
+        <?php
+        // Clear the toast message after displaying
+        unset($_SESSION['toast_message']);
+        unset($_SESSION['toast_type']);
+        ?>
+        <style>
+            .toast {
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 15px 20px;
+                border-radius: 8px;
+                color: white;
+                font-weight: bold;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+                z-index: 1000;
+                opacity: 0;
+                transition: opacity 0.5s ease-in-out;
+            }
+            .toast.show {
+                opacity: 1;
+            }
+            .toast-success { background-color: #28a745; }
+            .toast-danger { background-color: #dc3545; }
+            .toast-info { background-color: #17a2b8; }
+        </style>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const toast = document.getElementById('toast-message');
+                if (toast) {
+                    toast.classList.add('show');
+                    setTimeout(() => {
+                        toast.classList.remove('show');
+                        toast.addEventListener('transitionend', () => toast.remove());
+                    }, 3000); // Hide after 3 seconds
+                }
+            });
+        </script>
+    <?php endif; ?>
+
+    <!-- The rest of your page content will follow after this header -->
